@@ -34,16 +34,19 @@ def evaluate_time_per_sample(sample_function,mean,std,num_samples):
     time_per_sample = (toc - tic) / num_samples * 1e6
     print("%30s : %.3f us" % (sample_function.__name__, time_per_sample))
 
-mean = 0
-std = 2
-num_samples = 1000
-sample_functions = [
-    sample_normal_distribution_sum_uniforms,
-    sample_normal_distribution_rejection,
-    sample_normal_distribution_Box_Muller,
-    sample_normal_distribution_numpy
-]
-# for f in sample_functions:
-    # evaluate_time_per_sample(f,mean,std,num_samples)
+def main():
+    mean = 0
+    std = 2
+    num_samples = 1000
+    sample_functions = [
+        sample_normal_distribution_sum_uniforms,
+        sample_normal_distribution_rejection,
+        sample_normal_distribution_Box_Muller,
+        sample_normal_distribution_numpy
+    ]
+    for f in sample_functions:
+        evaluate_time_per_sample(f,mean,std,num_samples)
 
+if __name__ == "__main__":
+    main()
 
