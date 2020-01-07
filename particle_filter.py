@@ -10,14 +10,6 @@ from read_data import read_world, read_sensor_data
 from odometry_based_motion_model import odometry_based_motion_estimate
 from sensor_model import calc_likelyhood_measurements_given_position
 
-#add random seed for generating comparable pseudo random numbers
-np.random.seed(123)
-
-#plot preferences, interactive plotting mode
-plt.axis([-1, 12, 0, 10])
-plt.ion()
-plt.show()
-
 def plot_state(particles, landmarks, map_limits):
     # Visualizes the state of the particle filter.
     #
@@ -181,6 +173,14 @@ def main():
     #initialize the particles
     map_limits = [-1, 12, 0, 10]
     particles = initialize_particles(1000, map_limits)
+
+    #add random seed for generating comparable pseudo random numbers
+    np.random.seed(123)
+
+    #plot preferences, interactive plotting mode
+    plt.axis([-1, 12, 0, 10])
+    plt.ion()
+    plt.show()
 
     #run particle filter
     for timestep in range(int(len(sensor_readings)/2)):

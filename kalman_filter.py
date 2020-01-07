@@ -9,12 +9,6 @@ import matplotlib.pyplot as plt
 from read_data import read_world, read_sensor_data
 from matplotlib.patches import Ellipse
 
-#plot preferences, interactive plotting mode
-fig = plt.figure()
-plt.axis([-1, 12, 0, 10])
-plt.ion()
-plt.show()
-
 def plot_state(mu, sigma, landmarks, map_limits):
     # Visualizes the state of the kalman filter.
     #
@@ -47,7 +41,6 @@ def plot_state(mu, sigma, landmarks, map_limits):
     if max_ind == 0:
         min_ind = 1
 
-    min_eigvec = eigenvecs[:,min_ind]
     min_eigval = eigenvals[min_ind]
 
     #chi-square value for sigma confidence interval
@@ -71,30 +64,49 @@ def plot_state(mu, sigma, landmarks, map_limits):
     
     plt.pause(0.01)
 
-def prediction_step(odometry, mu, sigma):
+def odometry_motion_model_mean(odometry, mu):
+    mu_est = np.empty(np.shape(mu))
+    mu_est[0] = mu[0] + odometry['t']*np.cos(odometry['r1']+mu[2])
+    mu_est[1] = mu[1] + odometry['t']*np.sin(odometry['r1']+mu[2])
+    mu_est[2] = odometry['r1'] + odometry['r2']+ mu[2]
+
+    # Jacobian matrices 
+    Jacobian_location = np.array([[1.0, 0.0, -odometry['t']*np.sin(odometry['r1']+mu[2])],\
+                                  [0.0, 1.0, odometry['t']*np.cos(odometry['r1']+mu[2])],\
+                                  [0.0, 0.0, 1]])
+    Jacobian_control = np.array([[-odometry['t']*np.sin(odometry['r1']+mu[2]), 0.0, np.cos(odometry['r1']+mu[2])],\
+                                 [ odometry['t']*np.cos(odometry['r1']+mu[2]), 0.0, np.sin(odometry['r1']+mu[2])],\
+                                 [ 1.0, 1.0, 0.0]])     
+    return mu_est, Jacobian_location, Jacobian_control
+
+def sensor_model_mean(sensor_data, mu, landmarks, noise_scala):
+
+    estimated_measurements = np.empty(np.shape(sensor_data['range']))
+    Jacobian_sensor = np.empty((len(sensor_data['range']),len(mu)))
+    noise = np.zeros((len(sensor_data['range']),len(sensor_data['range'])))
+    i = 0
+    for id in sensor_data['id']:
+        estimated_measurements[i] = np.linalg.norm(mu[0:-1]-landmarks[id])
+        Jacobian_sensor[i,:] = np.array([(mu[0]-landmarks[id][0])/estimated_measurements[i],\
+                                         (mu[1]-landmarks[id][1])/estimated_measurements[i],\
+                                         0])
+        noise[i,i] = noise_scala
+        i += 1
+    return estimated_measurements, Jacobian_sensor, noise
+
+def prediction_step(odometry, mu, sigma, noise):
     # Updates the belief, i.e., mu and sigma, according to the motion 
     # model
     # 
     # mu: 3x1 vector representing the mean (x,y,theta) of the 
     #     belief distribution
     # sigma: 3x3 covariance matrix of belief distribution 
-    
-    x = mu[0]
-    y = mu[1]
-    theta = mu[2]
 
-    delta_rot1 = odometry['r1']
-    delta_trans = odometry['t']
-    delta_rot2 = odometry['r2']
+    mu_estimated, Jacob_loca, Jacob_control = odometry_motion_model_mean(odometry, mu)
+    sigma_estimated = Jacob_loca @ sigma @ Jacob_loca.T + Jacob_control @ noise @ Jacob_control.T
+    return mu_estimated, sigma_estimated
 
-    '''your code here'''
-    '''***        ***'''
-
-
-
-    return mu, sigma
-
-def correction_step(sensor_data, mu, sigma, landmarks):
+def correction_step(sensor_data, mu, sigma, landmarks, noise):
     # updates the belief, i.e., mu and sigma, according to the
     # sensor model
     # 
@@ -104,19 +116,12 @@ def correction_step(sensor_data, mu, sigma, landmarks):
     #     belief distribution
     # sigma: 3x3 covariance matrix of belief distribution 
 
-    x = mu[0]
-    y = mu[1]
-    theta = mu[2]
-
-    #measured landmark ids and ranges
-    ids = sensor_data['id']
-    ranges = sensor_data['range']
-
-    '''your code here'''
-    '''***        ***'''
-
-
-
+    estimated_mesurements, Jacob_sensor, noise = sensor_model_mean(sensor_data, mu, landmarks, noise)
+    
+    # Kalman gain
+    K = sigma @ Jacob_sensor.T @ np.linalg.inv(Jacob_sensor @ sigma @Jacob_sensor.T + noise)
+    mu = mu + K @ (sensor_data['range'] - estimated_mesurements)
+    sigma = (np.identity(np.shape(sigma)[0]) - K @ Jacob_sensor) @ sigma
     return mu, sigma
 
 def main():
@@ -128,13 +133,27 @@ def main():
     print("Reading sensor data")
     sensor_readings = read_sensor_data("src/ekf_data/sensor_data.dat")
 
-    #initialize belief
+    # initialize belief
     mu = [0.0, 0.0, 0.0]
     sigma = np.array([[1.0, 0.0, 0.0],\
                       [0.0, 1.0, 0.0],\
                       [0.0, 0.0, 1.0]])
 
     map_limits = [-1, 12, -1, 10]
+
+    # motion model noise
+    Q = np.array([[0.2, 0.0, 0.0],
+                  [0.0, 0.2, 0.0],
+                  [0.0, 0.0, 0.2]])
+
+    # noise in the sensor model
+    R_scala = 0.5
+
+    #plot preferences, interactive plotting mode
+    plt.figure()
+    plt.axis([-1, 12, 0, 10])
+    plt.ion()
+    plt.show()
 
     #run kalman filter
     for timestep in range(int(len(sensor_readings)/2)):
@@ -143,10 +162,10 @@ def main():
         plot_state(mu, sigma, landmarks, map_limits)
 
         #perform prediction step
-        mu, sigma = prediction_step(sensor_readings[timestep,'odometry'], mu, sigma)
+        mu, sigma = prediction_step(sensor_readings[timestep,'odometry'], mu, sigma, Q)
 
         #perform correction step
-        mu, sigma = correction_step(sensor_readings[timestep, 'sensor'], mu, sigma, landmarks)
+        mu, sigma = correction_step(sensor_readings[timestep, 'sensor'], mu, sigma, landmarks, R_scala)
 
     plt.show('hold')
 
