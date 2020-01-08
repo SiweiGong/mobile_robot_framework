@@ -12,3 +12,5 @@ So far these topics listed below are implemented in this repository:
   * sensor model
   * discrete Bayes filter
   * particle filter
+  * extended Kalman filter
+  * occupancy grid mapping
