@@ -1,8 +1,9 @@
-# The basic framework of the particle filter is provided by Albert-Ludwigs-Universität Freiburg,
-# the course Introduction to Mobile Robotics (engl.) - Autonomous Mobile Systems
-# Lecturer: Prof. Dr. Wolfram Burgard, Dr. Michael Tangermann, Dr. Daniel Büscher, Lukas Luft
-# Co-organizers: Marina Kollmitz, Iman Nematollahi
-
+"""
+The basic framework of the particle filter is provided by Albert-Ludwigs-Universität Freiburg,
+the course Introduction to Mobile Robotics (engl.) - Autonomous Mobile Systems
+Lecturer: Prof. Dr. Wolfram Burgard, Dr. Michael Tangermann, Dr. Daniel Büscher, Lukas Luft
+Co-organizers: Marina Kollmitz, Iman Nematollahi
+"""
 import numpy as np
 import scipy.stats
 import matplotlib.pyplot as plt

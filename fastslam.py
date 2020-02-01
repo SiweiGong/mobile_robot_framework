@@ -1,8 +1,9 @@
-# The basic framework of the FastSLAM is provided by Albert-Ludwigs-Universität Freiburg,
-# the course Introduction to Mobile Robotics (engl.) - Autonomous Mobile Systems
-# Lecturer: Prof. Dr. Wolfram Burgard, Dr. Michael Tangermann, Dr. Daniel Büscher, Lukas Luft
-# Co-organizers: Marina Kollmitz, Iman Nematollahi
-
+"""
+The basic framework of the FastSLAM is provided by Albert-Ludwigs-Universität Freiburg,
+the course Introduction to Mobile Robotics (engl.) - Autonomous Mobile Systems
+Lecturer: Prof. Dr. Wolfram Burgard, Dr. Michael Tangermann, Dr. Daniel Büscher, Lukas Luft
+Co-organizers: Marina Kollmitz, Iman Nematollahi
+"""
 from read_data import read_world, read_sensor_data
 from misc_tools import *
 from odometry_based_motion_model import odometry_based_motion_estimate

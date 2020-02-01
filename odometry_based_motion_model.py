@@ -1,6 +1,7 @@
-# The odometry based motion model helps to estimate the pose of the robot 
-# after a certain movement which is represented by odometry readings
-
+"""
+The odometry based motion model helps to estimate the pose of the robot 
+after a certain movement which is represented by odometry readings
+"""
 import sample_function as sf
 import numpy as np
 import scipy.stats

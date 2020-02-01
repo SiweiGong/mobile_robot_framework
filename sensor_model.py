@@ -1,6 +1,7 @@
-# This sensor model helps to calculate the likelyhood of the measurements given 
-# a position of the robot
-
+"""
+This sensor model helps to calculate the likelyhood of the measurements given 
+a position of the robot
+"""
 import numpy as np
 import scipy.stats
 import matplotlib.pyplot as plt

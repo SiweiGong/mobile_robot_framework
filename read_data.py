@@ -1,8 +1,9 @@
-# This file is provided by Albert-Ludwigs-Universität Freiburg
-# The course Introduction to Mobile Robotics (engl.) - Autonomous Mobile Systems
-# Lecturer: Prof. Dr. Wolfram Burgard, Dr. Michael Tangermann, Dr. Daniel Büscher, Lukas Luft
-# Co-organizers: Marina Kollmitz, Iman Nematollahi
-
+"""
+This file is provided by Albert-Ludwigs-Universität Freiburg
+The course Introduction to Mobile Robotics (engl.) - Autonomous Mobile Systems
+Lecturer: Prof. Dr. Wolfram Burgard, Dr. Michael Tangermann, Dr. Daniel Büscher, Lukas Luft
+Co-organizers: Marina Kollmitz, Iman Nematollahi
+"""
 def read_world(filename):
     # Reads the world definition and returns a list of landmarks, our 'map'.
     # 
