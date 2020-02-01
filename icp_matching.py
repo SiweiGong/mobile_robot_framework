@@ -84,6 +84,12 @@ def closest_point_matching(X, P):
       rows.append(min_ind[0])
       cols.append(min_ind[1])
 
+  # for i in range(num_pts):
+  #   min_ind = np.unravel_index(np.argmin(dist_mat, axis=None), dist_mat.shape)
+  #   P_matched[:,min_ind[0]] = P[:,min_ind[1]]
+  #   dist_mat[min_ind[0],:] = math.inf
+  #   dist_mat[:,min_ind[1]] = math.inf
+
   return P_matched
   
 def icp(X, P, do_matching):
